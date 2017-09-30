@@ -3,7 +3,7 @@
 #define IN2 A1
 #define IN3 A2
 #define IN4 A3
-#define MAX_SPEED 255 
+#define MAX_SPEED 150 
 #define MIN_SPEED 0
 // COLOR SENSOR/////////////////
 #define S0_r 1         // right motor
@@ -16,8 +16,13 @@
 #define S3_l 8
 #define sensorOut A4
 ////////////////////////////////
-#define TRIG 9
-#define ECHO 10
+///UltrasonicSensor/////////////
+#define TRIG1 9              //FRONT//
+#define ECHO1 10
+#define TRIG2 11             //BACK//
+#define ECHO2 12
+//OPPONENT//////////////
+#define OPPONENT 40
 
 int STOP=0,FD=1,BD=-1;
 int R1,G1,B1,C1,R2,G2,B2,C2;
@@ -29,15 +34,23 @@ void backward(int speed);
 void rotate(int speed);
 void findEnemy();
 void colorRead();
-int getDistance();
+int getDistance1();
+int getDistance2();
+bool findEnemy();
 ///////////////////////////////////////////////////////////////////////////////
 void setup() {
   Serial.begin(9600);
+  //Motor setup
   pinMode(IN1,OUTPUT);
   pinMode(IN2,OUTPUT);
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
-
+  
+  //Ultrasonic Setup
+  pinMode(TRIG1,OUTPUT);
+  pinMode(ECHO1,INPUT);
+  pinMode(TRIG2,OUTPUT);
+  pinMode(ECHO2,INPUT);
 }
 
 void loop() {
@@ -191,25 +204,40 @@ void rotate(int speed)
 bool findEnemy()
 {
   stop();
-  while(dis>...)
+  while(dis>OPPONENT)
   {
-    int dis=getDistance();
+    int dis=getDistance1();
     rotate(50);
   }
   return true;
 }
-int getDistance()
+int getDistance1()
 {
   float Time,dis;
-  digitalWrite(TRIG,0);
-  delay(10);
-  digitalWrite(TRIG,1);
-  delay(10);
-  digitalWrite(TRIG,0);
+  digitalWrite(TRIG1,LOW);
+  delayMicroseconds(10);
+  digitalWrite(TRIG1,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG1,LOW);
 
-  Time=pulseIn(ECHO,1,5000);
-  dis=Time/2/29.412;
+  Time=pulseIn(ECHO1,HIGH,5000);     //delay 5s
+  dis = Time/29.1/2;
+  //dis=Time/2/29.412;       //Convert to cm
 
   return dis;
 }
+int getDistance2()
+{
+  float Time,dis;
+  digitalWrite(TRIG2,LOW);
+  delayMicroseconds(10);
+  digitalWrite(TRIG2,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG2,LOW);
 
+  Time=pulseIn(ECHO2,HIGH,5000);     //delay 5s
+  dis = Time/29.1/2;
+  //dis=Time/2/29.412;       //Convert to cm
+
+  return dis;
+}
