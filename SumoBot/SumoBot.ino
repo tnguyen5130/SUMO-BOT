@@ -46,16 +46,19 @@ void setup() {
   pinMode(IN2,OUTPUT);
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
-  
+
+  /*
   //Ultrasonic Setup
   pinMode(TRIG1,OUTPUT);
   pinMode(ECHO1,INPUT);
   pinMode(TRIG2,OUTPUT);
   pinMode(ECHO2,INPUT);
+  */
 }
 
 void loop() {
   colorRead();
+  /*
   while(checkBorder()==false)
   {
     colorRead();
@@ -65,6 +68,7 @@ void loop() {
     }
   }
   backward(50);
+  */
   delay(50);
 }
 /////////////////////////////////////////////////////////////////////////////////
