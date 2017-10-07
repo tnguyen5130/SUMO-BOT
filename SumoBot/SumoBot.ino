@@ -34,6 +34,7 @@ void backward(int speed);
 void rotate(int speed);
 void findEnemy();
 void colorRead();
+bool checkBorder();
 int getDistance1();
 int getDistance2();
 bool findEnemy();
@@ -45,19 +46,30 @@ void setup() {
   pinMode(IN2,OUTPUT);
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
-  
+
+  /*
   //Ultrasonic Setup
   pinMode(TRIG1,OUTPUT);
   pinMode(ECHO1,INPUT);
   pinMode(TRIG2,OUTPUT);
   pinMode(ECHO2,INPUT);
+  */
 }
 
 void loop() {
-  while(findEnemy()==true)
+  colorRead();
+  /*
+  while(checkBorder()==false)
   {
-    forward(MAX_SPEED);
+    colorRead();
+    while(findEnemy()==true)
+    {
+      forward(MAX_SPEED);
+    }
   }
+  backward(50);
+  */
+  delay(50);
 }
 /////////////////////////////////////////////////////////////////////////////////
 void colorRead()
@@ -134,6 +146,18 @@ void colorRead()
   Serial.print(G2);
   Serial.print("\n");
   delay(50);
+}
+
+bool checkBorder()
+{
+  if(C1<0 || C2<0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void motor1Act(int act,int spd)
