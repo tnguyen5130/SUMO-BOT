@@ -54,11 +54,12 @@ void setup() {
   pinMode(TRIG2,OUTPUT);
   pinMode(ECHO2,INPUT);
   */
+  delay(2000);
 }
 
 void loop() {
   colorRead();
-  /*
+  
   while(checkBorder()==false)
   {
     colorRead();
@@ -68,7 +69,7 @@ void loop() {
     }
   }
   backward(50);
-  */
+  
   delay(50);
 }
 /////////////////////////////////////////////////////////////////////////////////
