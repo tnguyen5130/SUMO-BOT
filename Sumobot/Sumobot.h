@@ -12,7 +12,7 @@
 #define S2_L 2
 #define S3_L 3
 
-#define S0_R 4         // right sensor
+#define S0_R 13         // right sensor
 #define S1_R 5
 #define S2_R 6
 #define S3_R 7
@@ -31,7 +31,10 @@
 #define IN1 10
 #define IN2 11
 #define IN3 12
-#define IN4 13
+#define IN4 4
+
+#define MAX_SPEED 150 //from 0 - 255
+#define MIN_SPEED 0
 /// USE 5V GND
 
 #endif // SUMO_H_INCLUDED
