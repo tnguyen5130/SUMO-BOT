@@ -18,20 +18,24 @@
 /// USE 5V, 3.5V, GND
 
 //SONIC
-#define TRIG_PIN 8
-#define ECHO_PIN 9
-#define TIME_OUT 5000
+#define TRIG_PIN 12
+#define ECHO_PIN 13
+#define TIME_OUT 3000
 /// USE 5V, GND
 
 //MONITOR
-#define IN1 A0
-#define IN2 A1
-#define IN3 A2
-#define IN4 A3
+#define IN1 5
+#define IN2 6
+#define IN3 9
+#define IN4 10
 
-#define MAX_SPEED 150 //from 0 - 255
+#define MAX_SPEED 140 //from 0 - 255
 #define MIN_SPEED 0
+const int L_MAX_SPEED = MAX_SPEED;
+const int R_MAX_SPEED = MAX_SPEED * 0.605;
 /// USE 5V GND
+
+/// Battle variable
 
 /// Variable
 //color
@@ -51,8 +55,6 @@ void getColorRight();
 //Color
 void colorSetup()
 {
-    if (DEBUG)
-        Serial.begin(SERIAL);
     pinMode(S0_L, OUTPUT);
     pinMode(S1_L, OUTPUT);
     pinMode(S2_L, OUTPUT);
@@ -75,42 +77,41 @@ void colorSetup()
 
 void colorSens(int S0, int S1, int S2, int S3, int sensorOut, char* name)
 {
-    // Setting red filtered photodiodes to be read
     if (DEBUG)
         Serial.println(name);
     digitalWrite(S2,LOW);
     digitalWrite(S3,LOW);
-    // Reading the output frequency
+
     frequency = pulseIn(sensorOut, LOW);
-    // Printing the value on the serial monitor
+ 
     if (DEBUG)
     {
-        Serial.print("\tR = ");//printing name
-        Serial.print(frequency);//printing RED color frequency
+        Serial.print("\tR = ");
+        Serial.print(frequency);
         Serial.print("  ");
     }
 
     delay(100);
-    // Setting Green filtered photodiodes to be read
+    
     digitalWrite(S2,HIGH);
     digitalWrite(S3,HIGH);
-    // Reading the output frequency
+   
     frequency = pulseIn(sensorOut, LOW);
-    // Printing the value on the serial monitor
+    
     if (DEBUG)
     {
-        Serial.print("\tG = ");//printing name
-        Serial.print(frequency);//printing RED color frequency
+        Serial.print("\tG = ");
+        Serial.print(frequency);
         Serial.print("  ");
     }
 
     delay(100);
-    // Setting Blue filtered photodiodes to be read
+    
     digitalWrite(S2,LOW);
     digitalWrite(S3,HIGH);
-    // Reading the output frequency
+    
     frequency = pulseIn(sensorOut, LOW);
-    // Printing the value on the serial monitor
+    
     if (DEBUG)
     {
        Serial.print("\tB = ");//printing name
@@ -150,28 +151,10 @@ float GetDistance()
 
 void sonicSetup()
 {
-    if (DEBUG)
-        Serial.begin(SERIAL);
-
     pinMode(TRIG_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
 }
 
-void sonicTest()
-{
-    long distance = GetDistance();
-
-    if (distance <= 0)
-    {
-        Serial.println("Echo time out !!");
-    }
-    else
-    {
-        Serial.print("Distance to nearest obstacle (cm): ");
-        Serial.println(distance);
-    }
-    delay(1000);
-}
 //Monitor
 void monitorSetup()
 {
@@ -228,26 +211,47 @@ void R_Back(int speed)
 /// Main program
 void setup()
 {
-    
-    colorSetup();
+    Serial.begin(SERIAL);
+    //colorSetup();
     sonicSetup();
     monitorSetup();
     delay(INITIAL_DELAY);
+    Serial.println(L_MAX_SPEED);
+    Serial.println(R_MAX_SPEED);
 }
 
+/// Battle function
+void spin()
+{
+    
+    L_Back(L_MAX_SPEED * 0.6);
+    R_Forw(R_MAX_SPEED * 0.6);
+}
+void attack()
+{
+    
+    L_Forw(L_MAX_SPEED);
+    R_Forw(R_MAX_SPEED);
+    delay(500);
+}
 void loop()
 {
     //Color test
-    // colorTest();
-    
+    //colorTest();
+    //Sonic test
     //Monitor Test
     
-    L_Forw(MAX_SPEED);
-    R_Forw(MAX_SPEED);
-    delay(5000);
-    L_Back(MAX_SPEED);
-    R_Back(MAX_SPEED);
-    delay(5000);
+    if (GetDistance() <= 40 && GetDistance() > 1)
+    {
+      attack();
+    }
+    else
+    {
+      spin();
+    }
+
+    Serial.println("Distance");
+    
     
 }
 
