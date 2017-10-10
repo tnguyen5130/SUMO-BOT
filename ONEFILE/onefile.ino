@@ -3,7 +3,7 @@
 #define INITIAL_DELAY 1000
 
 //COLOR
-#define S0_L 0         // left sensor
+#define S0_L 0          // left sensor
 #define S1_L 1
 #define S2_L 2
 #define S3_L 3
@@ -33,25 +33,7 @@
 #define MIN_SPEED 0
 const int L_MAX_SPEED = MAX_SPEED;
 const int R_MAX_SPEED = MAX_SPEED * 0.605;
-/// USE 5V GND
 
-/// Battle variable
-
-/// Variable
-//color
-
-int frequency = 0;
-
-void colorSetup();
-void colorTest();
-void getColorLeft();
-void getColorRight();
-
-//Sonic
-
-//Monitor
-
-///Sources
 //Color
 void colorSetup()
 {
@@ -75,61 +57,46 @@ void colorSetup()
     digitalWrite(S1_R,LOW);
 }
 
-void colorSens(int S0, int S1, int S2, int S3, int sensorOut, char* name)
+int colorSens(int S0, int S1, int S2, int S3, int sensorOut)
 {
-    if (DEBUG)
-        Serial.println(name);
+    int frequency = 0;
+    int sum = 0;
+    delayMicroseconds(100);
     digitalWrite(S2,LOW);
     digitalWrite(S3,LOW);
 
     frequency = pulseIn(sensorOut, LOW);
+    sum+=frequency;
  
-    if (DEBUG)
-    {
-        Serial.print("\tR = ");
-        Serial.print(frequency);
-        Serial.print("  ");
-    }
-
-    delay(100);
-    
+    //delay(100);
+    delayMicroseconds(100);    
     digitalWrite(S2,HIGH);
     digitalWrite(S3,HIGH);
    
     frequency = pulseIn(sensorOut, LOW);
+    sum+=frequency;
     
-    if (DEBUG)
-    {
-        Serial.print("\tG = ");
-        Serial.print(frequency);
-        Serial.print("  ");
-    }
-
-    delay(100);
-    
+    //delay(100);
+    delayMicroseconds(100);    
     digitalWrite(S2,LOW);
     digitalWrite(S3,HIGH);
     
     frequency = pulseIn(sensorOut, LOW);
+    sum+=frequency;
     
-    if (DEBUG)
-    {
-       Serial.print("\tB = ");//printing name
-        Serial.print(frequency);//printing RED color frequency
-        Serial.println("");
-    }
-
-    delay(100);
+    //delay(100);
+    return sum/3;
 }
 
-
-void colorTest()
+int getColor_L()
 {
-    colorSens(S0_L, S1_L, S2_L, S3_L, sensorOut_L, "LEFT");
-    colorSens(S0_R, S1_R, S2_R, S3_R, sensorOut_R, "RIGHT");
-    if (DEBUG)
-        Serial.println("");
+  return colorSens(S0_L, S1_L, S2_L, S3_L, sensorOut_L);
 }
+int getColor_R()
+{
+  return colorSens(S0_R, S1_R, S2_R, S3_R, sensorOut_R);
+}
+
 //Sonic
 float GetDistance()
 {
@@ -207,51 +174,70 @@ void R_Back(int speed)
     analogWrite(IN4, speed);
 }
 
+/// Battle function
+void spin()
+{    
+    L_Back(L_MAX_SPEED * 0.6);
+    R_Forw(R_MAX_SPEED * 0.6);
+    delay(700);
+}
+void attack()
+{    
+    L_Forw(L_MAX_SPEED);
+    R_Forw(R_MAX_SPEED); 
+    delay(30);   
+}
+void safeMode()
+{
+    L_Back(L_MAX_SPEED*0.8);
+    R_Back(R_MAX_SPEED*0.8);
+    delay(700);
+}
 
 /// Main program
 void setup()
 {
     Serial.begin(SERIAL);
-    //colorSetup();
+    colorSetup();
     sonicSetup();
     monitorSetup();
     delay(INITIAL_DELAY);
-    Serial.println(L_MAX_SPEED);
-    Serial.println(R_MAX_SPEED);
+    
 }
 
-/// Battle function
-void spin()
-{
-    
-    L_Back(L_MAX_SPEED * 0.6);
-    R_Forw(R_MAX_SPEED * 0.6);
-}
-void attack()
-{
-    
-    L_Forw(L_MAX_SPEED);
-    R_Forw(R_MAX_SPEED);
-    delay(500);
-}
 void loop()
 {
     //Color test
     //colorTest();
     //Sonic test
     //Monitor Test
+    int colorL = getColor_L();
+    int colorR = getColor_R();
+    int distance = GetDistance();
     
-    if (GetDistance() <= 40 && GetDistance() > 1)
+
+    if (colorL > 400 && colorR > 400)
     {
-      attack();
+      if (distance <= 40 && distance > 2)
+      {
+        attack();
+      }
+      else
+      {
+        spin();
+      }
     }
     else
     {
-      spin();
+      safeMode();
     }
 
-    Serial.println("Distance");
-    
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.print("\t ColorL: ");
+    Serial.print(colorL);
+    Serial.print("\t ColorR: ");
+    Serial.println(colorR);    
     
 }
 
